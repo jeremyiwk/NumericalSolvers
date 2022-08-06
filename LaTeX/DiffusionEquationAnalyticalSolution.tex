@@ -1,0 +1,88 @@
+\documentclass[]{article}
+%\usepackage{setspace}
+%\onehalfspacing
+\usepackage{amsmath,amssymb,amsthm}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage{mdwlist}
+\usepackage{dirtytalk}
+\usepackage{xparse}
+\usepackage{accents}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\setcounter{MaxMatrixCols}{13}
+\setlength\parindent{0pt}
+\usepackage[none]{hyphenat}
+\usepackage[hmarginratio=1:1]{geometry}
+\begin{document}
+
+{\Huge Implementing Analytical Solutions}\\
+\hfill \\
+{Matthew Kafker, Jeremy Welsh-Kavan}\\
+%\end{center}
+%\vspace{0.2 cm}
+\hfill \\
+\noindent\rule{15cm}{0.4pt} \\
+
+
+\section{The Diffusion Equation}
+
+\subsection{The 1D Boundary Value problem.}
+
+To implement the analytical solution to the 1D diffusion equation with fixed boundary conditions, we shall simply cite the result from Asmar (p. 138) \footnote{Asmar, Nakhlé H., and Nakhlé H. Asmar. Partial Differential Equations with Fourier Series and Boundary Value Problems. 2nd ed. Upper Saddle River, N. j: Pearson Prentice Hall, 2005. Print.}. 
+
+The solution of the 1D boundary value problem for the diffusion equation 
+
+\begin{equation}
+\begin{split}
+\pdv{u}{t} = c^2 \pdv[2]{u}{x} ~~~~ 0 < x < L, ~ t > 0 \\
+u(0,t) = u(L,t) = 0 ~~~~ \text{for all} ~ t > 0 \\
+u(x, 0) = f(x) ~~~~ \text{for} 0 < x < L\\
+\end{split}
+\end{equation}
+
+can be written as the following Fourier series
+
+\begin{equation}
+\begin{split}
+u(x, t) = \sum_{n=1}^{\infty} b_n e^{- \lambda_n^2 t} \sin( \frac{ n \pi x}{ L } ) \\
+\end{split}
+\end{equation}
+
+where 
+
+\begin{equation}
+\begin{split}
+b_n = \frac{2}{L} \int_{0}^{L} f(x)  \sin( \frac{ n \pi x}{ L } )  dx ~~~ \text{and} ~~~ \lambda_n = \frac{c n \pi}{L} \\
+\end{split}
+\end{equation}
+
+Our analytical solution will have 3 components: the 1-dimensional arrays $[x]$ and $[t]$, which together define the extent and resolution of our system in space and time, and the 2-dimensional array $[u(x,t)]$. The function defining our initial condition, $[f(x)]$, is also a 1D array. Next, we choose a maximal value for $n$. This choice is usually motivated by the desired degree of accuracy in the solution. This is defined as an array, $[n]$, containing an ordered range of consecutive natural numbers. \\
+
+We can define arrays for $[e^{- \lambda_n^2 t}]$ and $[\sin( \frac{ n \pi x}{ L } )]$ with shapes $(t, n)$ and $(n, x)$, respectively. This is most easily done by applying a vectorized $\sin()$ and $\exp()$ to arrays $[t]^T \cdot [\lambda_n^2] $ and $[n]^T \cdot [\pi x /L]$, where $\cdot$ indicates a matrix product. For brevity, we will refer to these as $[\exp(t,n)] $ and $[\sin(n,x)]$. \\
+
+To compute $[\lambda_n]$ is very simple. For a given function, the procedure for computing $[b_n]$ may differ. The accuracy of the numerical integration will depend on the method chosen. However, for an arbitrary 1D array, $[f(x)]$, there is no reason to expect higher accuracy than the trapezoid rule, since we have no a priori knowledge of the behavior of $f(x)$ at points not contained in $[x]$. 
+
+With $[b_n]$, $[\exp(t,n)] $, and $[\sin(n,x)]$ defined, we can construct the array for our solution, $[u(x,t)]$, with a series of array products. First we perform an element-wise product of $[b_n]$ with $[\exp(t,n)]$ along the $n$ axis. This yields an array $[b_n \exp(t,n)] = [\exp(t,n)][b_n]$ with shape $(t,n)$. Next, to sum the series requires a single matrix multiplication, $[u(x,t)] = [b_n \exp(t,n)] \cdot [\sin(n,x)]$. It may be useful to convince yourself that this is indeed the array we want.
+
+
+
+\hfill \\
+
+
+%\begin{equation}
+%\begin{split}
+%\end{split}
+%\end{equation}
+
+\begin{center}
+\noindent\rule{15cm}{0.4pt} \\
+\end{center}
+$$\clubsuit$$
+\end{document}
